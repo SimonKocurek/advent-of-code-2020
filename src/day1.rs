@@ -1,4 +1,5 @@
 mod utils;
+mod day1_bonus;
 
 fn main() {
     let lines = utils::read_input();
