@@ -30,7 +30,3 @@ fn trees_on_slope(lines: &Vec<String>, x_diff: usize, y_diff: usize) -> usize {
     result
 }
 
-//     result = 1
-//     for xDiff, yDiff in [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]:
-//         result *= trees_on_slope(lines, xDiff=xDiff, yDiff=yDiff)
-//     print(result)
