@@ -8,17 +8,17 @@ fn main() {
 
     let inside_bags = invert_bag_rules(&rules);
 
-    let mut gold_bag_holders = Vec::<String>::new();
+    let mut gold_bag_holders = Vec::<&str>::new();
     let mut possible_holders = inside_bags["shiny gold"].clone();
     while !possible_holders.is_empty() {
-        let mut new_holders = Vec::<String>::new();
+        let mut new_holders = Vec::<&str>::new();
 
         for possible_holder in possible_holders {
             if gold_bag_holders.contains(&possible_holder) {
                 continue; // Bag already counted
             }
 
-            gold_bag_holders.push(possible_holder.clone());
+            gold_bag_holders.push(possible_holder);
 
             if let Some(new_possible_holders) = inside_bags.get(&possible_holder) {
                 new_holders.extend(new_possible_holders.iter().cloned());
@@ -70,15 +70,16 @@ fn parse_contents(contents: &str) -> Vec<&str> {
         .collect()
 }
 
-fn invert_bag_rules(rules: &Vec<(&str, Vec<&str>)>) -> HashMap<String, Vec<String>> {
-    let mut inside_bags = HashMap::<String, Vec<String>>::new();
+fn invert_bag_rules<'a>(rules: &Vec<(&'a str, Vec<&'a str>)>) -> HashMap<&'a str, Vec<&'a str>> {
+    let mut inside_bags = HashMap::<&'a str, Vec<&'a str>>::new();
 
     for (bag, bag_contents) in rules {
         for nested_bag in bag_contents {
             let inside = inside_bags
-                .entry(nested_bag.to_string())
+                .entry(nested_bag)
                 .or_insert(Vec::new());
-            inside.push(bag.to_string());
+
+            inside.push(bag);
         }
     }
 
