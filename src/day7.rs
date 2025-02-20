@@ -4,9 +4,9 @@ mod utils;
 
 fn main() {
     let lines = utils::read_input();
-    let rules = parse_input(lines);
+    let rules = parse_input(&lines);
 
-    let inside_bags = invert_bag_rules(rules);
+    let inside_bags = invert_bag_rules(&rules);
 
     let mut gold_bag_holders = Vec::<String>::new();
     let mut possible_holders = inside_bags["shiny gold"].clone();
@@ -31,7 +31,7 @@ fn main() {
     println!("{}", gold_bag_holders.len());
 }
 
-fn parse_input(lines: Vec<String>) -> Vec<(String, Vec<String>)> {
+fn parse_input(lines: &Vec<String>) -> Vec<(&str, Vec<&str>)> {
     lines
         .iter()
         .map(|line| {
@@ -41,18 +41,18 @@ fn parse_input(lines: Vec<String>) -> Vec<(String, Vec<String>)> {
             let contents = parts.next().unwrap(); // 1 bright white bag, 2 muted yellow bags.
             (bag, contents)
         })
-        .filter(|&(_, contents)| {
-            contents != "no other bags." // Special case
-        })
         .map(|(bag, contents)| {
-            let bag_clone = bag.to_string();
             let content_bags = parse_contents(contents);
-            (bag_clone, content_bags)
+            (bag, content_bags)
         })
         .collect()
 }
 
-fn parse_contents(contents: &str) -> Vec<String> {
+fn parse_contents(contents: &str) -> Vec<&str> {
+    if contents == "no other bags." {
+        return Vec::new();
+    }
+
     contents
         .split(", ")
         .map(|content| {
@@ -60,20 +60,25 @@ fn parse_contents(contents: &str) -> Vec<String> {
             let mut parts = content.splitn(2, ' ');
 
             parts.next().unwrap(); // 4
-            parts.next().unwrap() // muted yellow bags.
-                .rsplitn(2, ' ').nth(1).unwrap() // muted yellow
-                .to_string()
+            parts
+                .next()
+                .unwrap() // muted yellow bags.
+                .rsplitn(2, ' ')
+                .nth(1)
+                .unwrap() // muted yellow
         })
         .collect()
 }
 
-fn invert_bag_rules(rules: Vec<(String, Vec<String>)>) -> HashMap<String, Vec<String>> {
+fn invert_bag_rules(rules: &Vec<(&str, Vec<&str>)>) -> HashMap<String, Vec<String>> {
     let mut inside_bags = HashMap::<String, Vec<String>>::new();
 
     for (bag, bag_contents) in rules {
         for nested_bag in bag_contents {
-            let inside = inside_bags.entry(nested_bag).or_insert(Vec::new());
-            inside.push(bag.clone());
+            let inside = inside_bags
+                .entry(nested_bag.to_string())
+                .or_insert(Vec::new());
+            inside.push(bag.to_string());
         }
     }
 
