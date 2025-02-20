@@ -2,35 +2,16 @@ use std::collections::HashMap;
 
 mod utils;
 
+const GOLD_BAG: &str = "shiny gold";
+
 fn main() {
     let lines = utils::read_input();
     let rules = parse_input(&lines);
-
     let inside_bags = invert_bag_rules(&rules);
-
-    let mut gold_bag_holders = Vec::<&str>::new();
-    let mut possible_holders = inside_bags["shiny gold"].clone();
-    while !possible_holders.is_empty() {
-        let mut new_holders = Vec::<&str>::new();
-
-        for possible_holder in possible_holders {
-            if gold_bag_holders.contains(&possible_holder) {
-                continue; // Bag already counted
-            }
-
-            gold_bag_holders.push(possible_holder);
-
-            if let Some(new_possible_holders) = inside_bags.get(&possible_holder) {
-                new_holders.extend(new_possible_holders.iter().cloned());
-            }
-        }
-
-        possible_holders = new_holders;
-    }
+    let gold_bag_holders = get_gold_bag_holders(&inside_bags);
 
     println!("{}", gold_bag_holders.len());
 }
-
 fn parse_input(lines: &Vec<String>) -> Vec<(&str, Vec<&str>)> {
     lines
         .iter()
@@ -75,13 +56,36 @@ fn invert_bag_rules<'a>(rules: &Vec<(&'a str, Vec<&'a str>)>) -> HashMap<&'a str
 
     for (bag, bag_contents) in rules {
         for nested_bag in bag_contents {
-            let inside = inside_bags
-                .entry(nested_bag)
-                .or_insert(Vec::new());
+            let inside = inside_bags.entry(nested_bag).or_insert(Vec::new());
 
             inside.push(bag);
         }
     }
 
     inside_bags
+}
+
+fn get_gold_bag_holders<'a>(inside_bags: &HashMap<&'a str, Vec<&'a str>>) -> Vec<&'a str> {
+    let mut gold_bag_holders = inside_bags[GOLD_BAG].clone();
+
+    let mut possible_holders = gold_bag_holders.clone();
+    while !possible_holders.is_empty() {
+        let mut new_holders = Vec::<&str>::new();
+
+        for possible_holder in possible_holders {
+            if let Some(new_possible_holders) = inside_bags.get(&possible_holder) {
+                for new_possible_holder in new_possible_holders {
+                    if gold_bag_holders.contains(new_possible_holder) {
+                        continue; // Bag already counted
+                    }
+                    new_holders.push(new_possible_holder);
+                    gold_bag_holders.push(new_possible_holder);
+                }
+            }
+        }
+
+        possible_holders = new_holders;
+    }
+
+    gold_bag_holders
 }
