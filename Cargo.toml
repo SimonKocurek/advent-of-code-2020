@@ -4,4 +4,4 @@ name = "advent_of_code_2020"
 
 [[bin]]
 name = "solution"
-path = "src/day10.rs"
+path = "src/day10_bonus.rs"
