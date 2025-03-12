@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 mod utils;
 
-const FINAL_NUMBER: usize = 2020;
+const FINAL_NUMBER: usize = 30_000_000;
 
 fn main() {
     let lines = utils::read_input();
