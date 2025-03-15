@@ -144,13 +144,6 @@ func getWordToField(tickets *Tickets) ([]int, error) {
 	// Precompute, so that we don't have to redo this calculation
 	wordMatchesField := getWordMatchesField(tickets)
 
-	// // As we explore the tree of options, we also prune the "used" fields.
-	// // For prunning to be more effective, it's better to start with words that have fewest options.
-	// // And let the words with most options be at the end.
-	// sort.Slice(tickets.words, func(i, j int) bool {
-	// 	return len(wordMatchesField[i]) < len(wordMatchesField[j])
-	// })
-
 	wordToField := make([]int, len(tickets.words))
 	fieldUsed := make([]bool, len(tickets.words))
 
